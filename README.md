@@ -25,6 +25,6 @@ This project analyzes Spotify music data to explore patterns in musical features
 2. Knit the file to HTML to reproduce the full report.
 3. Make sure the dataset is in the same folder or the URL works if web-linked.
 
-## 🔗 Data Source
+## Data Source
 The dataset was accessed from [https://www.kaggle.com/datasets/solomonameh/spotify-music-dataset].
 
