@@ -1,7 +1,7 @@
 # STAT184Project
 Spotify Music Analysis
 
-**Author:** Cohen Gress  
+**Author:** Anonymous  
 **Course:** STAT 184  
 **Project Title:** Spotify Music Analysis  
 **Date:** Spring 2025
