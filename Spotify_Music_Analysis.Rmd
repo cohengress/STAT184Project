@@ -1,0 +1,152 @@
+---
+title: "Spotify Music Analysis"
+author: "Anonymous"
+date: "04/13/2025"
+output:
+  html_notebook:
+    fig_height: 7
+    fig_width: 10
+
+---
+
+## What key audio features distinguish high popularity songs from low popularity songs on Spotify?
+
+### About the datasets:
+
+
+The project utilizes two distinct datasets sourced from Spotify’s public API, representing songs with high and low popularity scores, respectively. Both datasets contain rich audio features and track metadata, including characteristics like danceability, energy, valence, tempo, and duration. The high popularity dataset includes songs that have performed well on Spotify in terms of streaming and user engagement, providing insight into what attributes may contribute to commercial success. These tracks span multiple decades and originate from Spotify’s global catalog, capturing songs across various genres and countries. The data was compiled and shared publicly via Kaggle by an independent contributor.
+
+The low popularity dataset mirrors the high popularity one in structure and time range, offering a valuable contrast by highlighting tracks that failed to gain widespread attention. By comparing these two datasets, the analysis aims to uncover what differentiates a hit from an overlooked song. Both sources are used together to explore the influence of musical features on popularity, forming the basis for a guiding research question: What makes a song popular on Spotify? This comparison helps identify patterns or features that may be absent in less popular songs and enriches the understanding of success factors in music streaming.
+
+```{r}
+
+rm(list = ls())
+
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(readr)
+```
+
+```{r}
+# Load high and low popularity datasets
+high_pop <- read_csv("high_popularity_spotify_data.csv")
+low_pop <- read_csv("low_popularity_spotify_data.csv")
+
+# Add label for group
+high_pop <- high_pop %>% mutate(pop_group = "High")
+low_pop <- low_pop %>% mutate(pop_group = "Low")
+
+# Combine both datasets
+spotify_combined <- bind_rows(high_pop, low_pop)
+
+# Check the structure
+str(spotify_combined)
+```
+
+
+```{r}
+# Preview high popularity dataset
+head(high_pop)
+
+# Preview low popularity dataset
+head(low_pop)
+
+```
+
+
+```{r}
+spotify_combined %>%
+  group_by(pop_group) %>%
+  summarise(across(c(danceability, energy, valence, tempo, acousticness), list(mean = mean, sd = sd), na.rm = TRUE))
+
+```
+
+```{r}
+ggplot(spotify_combined, aes(x = pop_group, y = energy, fill = pop_group)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("High" = "#1DB954", "Low" = "#1DB954")) +
+  labs(title = "Energy Distribution by Popularity Group", x = "Popularity Group", y = "Energy") +
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "#191414", color = NA),
+    panel.background = element_rect(fill = "#191414"),
+    legend.position = "none",
+    text = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    axis.title = element_text(color = "white"),
+    plot.title = element_text(color = "#1DB954", face = "bold")
+  )
+
+ggplot(spotify_combined, aes(x = pop_group, y = danceability, fill = pop_group)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("High" = "#1DB954", "Low" = "#1DB954")) +
+  labs(title = "Danceability Distribution by Popularity Group", x = "Popularity Group", y = "Danceability") +
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "#191414", color = NA),
+    panel.background = element_rect(fill = "#191414"),
+    legend.position = "none",
+    text = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    axis.title = element_text(color = "white"),
+    plot.title = element_text(color = "#1DB954", face = "bold")
+  )
+
+```
+
+```{r}
+ggplot(spotify_combined, aes(x = valence, fill = pop_group)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("High" = "#1DB954", "Low" = "white")) +
+  labs(title = "Valence Distribution for High vs Low Popularity Songs",
+       x = "Valence", y = "Density") +
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "#191414", color = NA),
+    panel.background = element_rect(fill = "#191414"),
+    legend.background = element_rect(fill = "#191414"),
+    legend.key = element_rect(fill = "white"),
+    legend.title = element_blank(),
+    legend.text = element_text(color = "white"),
+    text = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    axis.title = element_text(color = "white"),
+    plot.title = element_text(color = "#1DB954", face = "bold")
+  )
+```
+
+My analysis revealed that high popularity songs on Spotify generally exhibit higher energy and danceability, suggesting that upbeat and rhythm-driven songs are more likely to succeed with mainstream audiences. In contrast, low popularity songs display greater variability in features like acousticness and valence, indicating a broader range of emotional tone and sound style that may appeal to niche listeners but lack mass appeal. These distinctions suggest that specific audio characteristics—particularly those that contribute to energetic and danceable music—are more closely aligned with widespread popularity on streaming platforms.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
