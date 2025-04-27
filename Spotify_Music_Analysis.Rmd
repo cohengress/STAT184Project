@@ -1,6 +1,6 @@
 ---
 title: "Spotify Music Analysis"
-author: "Anonymous"
+author: "Cohen Gress"
 date: "04/13/2025"
 output:
   html_notebook:
@@ -17,6 +17,14 @@ output:
 The project utilizes two distinct datasets sourced from Spotify’s public API, representing songs with high and low popularity scores, respectively. Both datasets contain rich audio features and track metadata, including characteristics like danceability, energy, valence, tempo, and duration. The high popularity dataset includes songs that have performed well on Spotify in terms of streaming and user engagement, providing insight into what attributes may contribute to commercial success. These tracks span multiple decades and originate from Spotify’s global catalog, capturing songs across various genres and countries. The data was compiled and shared publicly via Kaggle by an independent contributor.
 
 The low popularity dataset mirrors the high popularity one in structure and time range, offering a valuable contrast by highlighting tracks that failed to gain widespread attention. By comparing these two datasets, the analysis aims to uncover what differentiates a hit from an overlooked song. Both sources are used together to explore the influence of musical features on popularity, forming the basis for a guiding research question: What makes a song popular on Spotify? This comparison helps identify patterns or features that may be absent in less popular songs and enriches the understanding of success factors in music streaming.
+
+## Key Term Definitions
+- **Energy**: A measure from 0.0 to 1.0 describing how energetic a track feels based on features like speed, loudness, and noisiness. Higher energy tracks feel more intense and dynamic.
+- **Valence**: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Higher valence means the track sounds happier or more positive.
+- **Danceability**: How suitable a track is for dancing based on tempo, rhythm stability, beat strength, and overall regularity.
+
+
+
 
 ```{r}
 
@@ -43,8 +51,6 @@ spotify_combined <- bind_rows(high_pop, low_pop)
 # Check the structure
 str(spotify_combined)
 ```
-
-
 ```{r}
 # Preview high popularity dataset
 head(high_pop)
@@ -53,6 +59,36 @@ head(high_pop)
 head(low_pop)
 
 ```
+
+```{r}
+# Using regular expressions to find songs with "love" in the track name
+love_songs <- spotify_combined %>%
+  filter(str_detect(track_name, regex("love", ignore_case = TRUE)))
+
+# Preview love songs
+head(love_songs)
+
+```
+```{r}
+# Defining a user function that safely handles NA values
+classify_energy <- function(energy_value) {
+  if (is.na(energy_value)) {
+    return(NA)  # keep missing values missing
+  } else if (energy_value >= 0.7) {
+    return("High Energy")
+  } else if (energy_value >= 0.4) {
+    return("Medium Energy")
+  } else {
+    return("Low Energy")
+  }
+}
+
+# Apply the function to create a new column
+spotify_combined <- spotify_combined %>%
+  mutate(energy_level = sapply(energy, classify_energy))
+
+```
+
 
 
 ```{r}
@@ -77,23 +113,33 @@ ggplot(spotify_combined, aes(x = pop_group, y = energy, fill = pop_group)) +
     axis.title = element_text(color = "white"),
     plot.title = element_text(color = "#1DB954", face = "bold")
   )
+```
 
-ggplot(spotify_combined, aes(x = pop_group, y = danceability, fill = pop_group)) +
-  geom_boxplot() +
-  scale_fill_manual(values = c("High" = "#1DB954", "Low" = "#1DB954")) +
-  labs(title = "Danceability Distribution by Popularity Group", x = "Popularity Group", y = "Danceability") +
+This boxplot compares the energy levels between high and low popularity songs. High popularity tracks tend to have a slightly higher median energy, and the overall distribution is shifted upward compared to low popularity songs. This supports the idea that songs with greater energy are more likely to become popular on Spotify.
+
+```{r}
+ggplot() +
+  geom_density(data = high_pop, aes(x = loudness), color = "#1DB954", fill = "#1DB954", alpha = 0.4) +
+  geom_density(data = low_pop, aes(x = loudness), color = "white", fill = "white", alpha = 0.4) +
+  labs(title = "Loudness Distribution: High vs Low Popularity Songs",
+       x = "Loudness (dB)",
+       y = "Density") +
   theme_minimal() +
   theme(
     plot.background = element_rect(fill = "#191414", color = NA),
-    panel.background = element_rect(fill = "#191414"),
-    legend.position = "none",
-    text = element_text(color = "white"),
+    panel.background = element_rect(fill = "#191414", color = NA),
+    panel.grid.major = element_line(color = "gray30"),
+    panel.grid.minor = element_line(color = "gray20"),
     axis.text = element_text(color = "white"),
     axis.title = element_text(color = "white"),
-    plot.title = element_text(color = "#1DB954", face = "bold")
+    plot.title = element_text(color = "#1DB954", face = "bold"),
+    legend.position = "none"
   )
 
 ```
+
+This density plot shows that high popularity songs are generally louder than low popularity songs. The distribution for high popularity tracks is clearly shifted toward higher loudness values, suggesting that louder, more intense audio is associated with better streaming performance.
+
 
 ```{r}
 ggplot(spotify_combined, aes(x = valence, fill = pop_group)) +
@@ -116,7 +162,11 @@ ggplot(spotify_combined, aes(x = valence, fill = pop_group)) +
   )
 ```
 
-My analysis revealed that high popularity songs on Spotify generally exhibit higher energy and danceability, suggesting that upbeat and rhythm-driven songs are more likely to succeed with mainstream audiences. In contrast, low popularity songs display greater variability in features like acousticness and valence, indicating a broader range of emotional tone and sound style that may appeal to niche listeners but lack mass appeal. These distinctions suggest that specific audio characteristics—particularly those that contribute to energetic and danceable music—are more closely aligned with widespread popularity on streaming platforms.
+This graph compares valence, which measures the emotional positivity of a track, across popularity groups. The distributions overlap more heavily compared to energy and loudness, meaning both happy and sad songs can achieve popularity. However, high popularity songs still show a slight skew toward higher valence, hinting that more positive-sounding tracks may have a small advantage.
+
+To better understand the relationship between musical features and song popularity, I analyzed energy, loudness, and valence across high and low popularity groups. These features were chosen because they each capture different aspects of a song’s sound: energy reflects intensity, loudness measures audio strength, and valence indicates emotional positivity. The following visualizations highlight key differences between popular and less popular songs, offering insight into how specific audio characteristics align with streaming success on Spotify.
+
+
 
 
 
