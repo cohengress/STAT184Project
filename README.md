@@ -1,13 +1,13 @@
 # STAT184Project
 Spotify Music Analysis
 
-**Author:** Anonymous  
+**Author:** Cohen Gress  
 **Course:** STAT 184  
 **Project Title:** Spotify Music Analysis  
 **Date:** Spring 2025
 
 ## Project Overview
-This project analyzes Spotify music data to explore patterns in musical features like energy, valence, and popularity. Using R, I cleaned and visualized the dataset to compare attributes across different popularity groups and uncover trends in modern music.
+This project analyzes Spotify music data to explore patterns in musical features like energy, valence, and loudness. Using R, I cleaned and visualized the dataset to compare attributes across different popularity groups and uncover trends in modern music.
 
 ## Tools Used
 - R & R Markdown
